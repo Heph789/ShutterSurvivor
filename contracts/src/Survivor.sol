@@ -22,6 +22,10 @@ contract Survivor is AccessControl {
     event VoteCast(bytes32 indexed gameId, address caster, bytes32 commitment);
     event PlayerRemoved(bytes32 indexed gameId, address removedPlayer);
 
+    function getAddressStatus(bytes32 gameId, address add) external view returns(AddressStatus) {
+        return activeGames[gameId].addressStatuses[add];
+    }
+
     // note: make sure to store addresses in a sorted order
     function createGame(string calldata name, address[] memory addresses) external {
         bytes32 id = keccak256(abi.encodePacked(name));
@@ -36,7 +40,7 @@ contract Survivor is AccessControl {
     }
 
     function startRound(bytes32 gameId, uint256 endTime) external onlyRole(gameId) {
-        require(activeGames[gameId].nextRoundEnd != 0, "Round already in progress");
+        require(activeGames[gameId].nextRoundEnd == 0, "Round already in progress");
         activeGames[gameId].nextRoundEnd = endTime;
     }
 
